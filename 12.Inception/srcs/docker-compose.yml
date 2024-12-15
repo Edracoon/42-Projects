@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    build: requirements/nginx/.
+    image: nginx
+    container_name: nginx
+    ports:
+      - 443:443
+    volumes:
+      - v_wordpress:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    restart: on-failure
+
+  wordpress:
+    build: requirements/wordpress/.
+    image: wordpress
+    container_name: wordpress
+    volumes:
+      -  v_wordpress:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      SITE_URL: ${DOMAIN_NAME}
+      TITLE: ${TITLE}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+    networks:
+      - inception
+    restart: on-failure
+
+  mariadb:
+    build: requirements/mariadb/.
+    image: mariadb
+    container_name: mariadb
+    volumes:
+      - v_mariadb:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    networks:
+      - inception
+    restart: on-failure
+
+networks:
+  inception:
+    name: inception
+    driver: bridge
+
+volumes:
+  v_mariadb:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: '/home/epfennig/data/mariadb'
+  v_wordpress:
+    driver: local
+    driver_opts:
+      o: 'bind'
+      type: 'none'
+      device: '/home/epfennig/data/wordpress'

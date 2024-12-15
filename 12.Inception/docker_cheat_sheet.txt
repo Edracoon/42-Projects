@@ -1,0 +1,44 @@
+=== Si docker marche pas sur le pc ===
+bash init_docker.sh
+
+=== Build image ===
+docker build -t <name> .
+
+=== Suppression des images ===
+docker rmi <name>	# une image
+docker rmi $(docker images -a -q)	# all images
+
+=== Lancer le conteneur avec l'image voulu ===
+docker run -d -p 80:80 --name=<ctnr_name> <image>	# -d = detached mode (background)
+													# -p = port 80 of the host to port 80 in the container
+=== Rentrer dans un container en cours ===
+docker exec -ti *nomconteneurouid* sh
+
+=== delete tous les container stopped and running ===
+docker container rm -f $(docker ps -aq)
+
+========================================================================
+
+=== Docker Compose ===
+Docker Compose is a tool that was developed to help define and share multi-container applications. 
+On va set des "services" et les configurer dans le docker_compose, les images souhaitées, les volumes,
+les ports, les variables d'environments.
+
+=== Pour le lancer on vérifie qu'il n'y ai pas de copie de l'app ou de db qui run ===
+docker ps	ET	docker rm -f <ids>
+
+=== Lancer le docker compose ===
+docker-compose up -d	# -d lancer l'app dans le background
+
+=== Verifier que l'ensemble de mes containers soit fonctionnel ===
+docker-compose ps
+
+=== Voir les logs de docker-compose ===
+docker-compose logs -f --tail 5
+
+=== Arreter la stack docker-compose ===
+docker-compose stop
+docker-compose down # supprimer l'ensemble des ressources creer lors de la stack
+
+=== Valider la syntax du docker compose ===
+docker-compose config
